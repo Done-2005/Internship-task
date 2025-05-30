@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Responsive Page</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    header {
+      background-color: #333;
+      color: white;
+      padding: 1rem;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 1rem;
+    }
+
+    nav ul li {
+      padding: 0.5rem;
+    }
+
+    nav ul a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .container {
+      display: flex;
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    .column {
+      flex: 1;
+      padding: 1rem;
+      background-color: #f0f0f0;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    footer {
+      background-color: #333;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    /* === Media Queries === */
+    @media (max-width: 768px) {
+      nav ul {
+        flex-direction: column;
+      }
+
+      .container {
+        flex-direction: column;
+      }
+
+      body {
+        font-size: 14px;
+      }
+
+      header, footer {
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Responsive Website</h1>
+    <nav>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="column">
+      <h2>Column 1</h2>
+      <p>This is some text in the first column. Resize the window to see the layout change.</p>
+      <img src="https://via.placeholder.com/600x300" alt="Placeholder Image">
+    </div>
+    <div class="column">
+      <h2>Column 2</h2>
+      <p>This is some text in the second column. It stacks below the first column on small screens.</p>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Responsive Design Demo
+  </footer>
+</body>
+</html>
