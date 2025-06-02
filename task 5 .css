@@ -1,0 +1,45 @@
+/* Reset & basic styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background-color: #f5f5f5;
+  color: #333;
+  line-height: 1.6;
+}
+
+header {
+  background-color: #4a90e2;
+  color: white;
+  padding: 2rem;
+  text-align: center;
+}
+
+.projects {
+  padding: 2rem;
+}
+
+.project-card {
+  background-color: white;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: #eee;
+  margin-top: 2rem;
+}
+
+a {
+  color: #4a90e2;
+  text-decoration: none;
+}https://<https://github.com/Done-2005/Internship-task.git>.github.io
+
