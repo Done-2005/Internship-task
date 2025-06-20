@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/html.min.js"></script>
+    <style>
+        /* Custom styles to enhance prose and dark mode */
+        body {
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Basic Tailwind Typography-like styles for markdown output */
+        .markdown-output h1 { font-size: 2.25rem; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.75em; }
+        .markdown-output h2 { font-size: 1.875rem; font-weight: 600; margin-top: 1.25em; margin-bottom: 0.75em; }
+        .markdown-output h3 { font-size: 1.5rem; font-weight: 600; margin-top: 1em; margin-bottom: 0.5em; }
+        .markdown-output p { margin-bottom: 1em; line-height: 1.6; }
+        .markdown-output ul { list-style-type: disc; margin-left: 1.5em; margin-bottom: 1em; }
+        .markdown-output ol { list-style-type: decimal; margin-left: 1.5em; margin-bottom: 1em; }
+        .markdown-output li { margin-bottom: 0.5em; }
+        .markdown-output a { color: var(--primary-color, #3b82f6); text-decoration: underline; }
+        .markdown-output code {
+            background-color: var(--code-bg, #e2e8f0);
+            padding: 0.2em 0.4em;
+            border-radius: 0.25rem;
+            font-family: monospace;
+        }
+        .markdown-output pre {
+            background-color: var(--pre-bg, #2d3748);
+            color: var(--pre-text, #f7fafc);
+            padding: 1em;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1em;
+        }
+        .markdown-output pre code {
+            background-color: transparent;
+            padding: 0;
+            border-radius: 0;
+            font-size: 0.9em;
+        }
+        .markdown-output blockquote {
+            border-left: 4px solid var(--primary-color, #3b82f6);
+            padding-left: 1em;
+            margin-left: 0;
+            color: #4a5568; /* gray-600 */
+        }
+        .markdown-output table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1em;
+        }
+        .markdown-output th, .markdown-output td {
+            border: 1px solid #e2e8f0; /* gray-200 */
+            padding: 0.75em;
+            text-align: left;
+        }
+        .markdown-output th {
+            background-color: #f7fafc; /* gray-50 */
+        }
+
+        /* Dark mode specific overrides for typography */
+        .theme-dark .markdown-output h1,
+        .theme-dark .markdown-output h2,
+        .theme-dark .markdown-output h3,
+        .theme-dark .markdown-output p,
+        .theme-dark .markdown-output ul,
+        .theme-dark .markdown-output ol,
+        .theme-dark .markdown-output li,
+        .theme-dark .markdown-output blockquote,
+        .theme-dark .markdown-output table,
+        .theme-dark .markdown-output th,
+        .theme-dark .markdown-output td {
+            /* Inherit from parent or set explicitly for dark mode */
+            color: inherit;
+        }
+        .theme-dark .markdown-output code {
+            background-color: var(--code-bg-dark, #4a5568);
+            color: var(--code-text-dark, #edf2f7);
+        }
+        .theme-dark .markdown-output pre {
+            background-color: var(--pre-bg-dark, #2d3748);
+            color: var(--pre-text-dark, #f7fafc);
+        }
+        .theme-dark .markdown-output th {
+            background-color: #2d3748; /* gray-800 */
+            color: #f7fafc;
+        }
+        .theme-dark .markdown-output blockquote {
+            border-color: var(--primary-color-dark, #2dd4bf);
+            color: #cbd5e0; /* gray-300 */
+        }
+
+
+        /* Define CSS Variables for Themes */
+        :root {
+            --bg-base: #f7fafc; /* gray-50 */
+            --text-base: #2d3748; /* gray-800 */
+            --primary-color: #3b82f6; /* blue-500 */
+            --input-bg: #ffffff;
+            --input-border: #e2e8f0; /* gray-200 */
+            --card-bg: #ffffff;
+            --card-shadow: rgba(0, 0, 0, 0.1);
+            --code-bg: #e2e8f0; /* gray-200 */
+            --pre-bg: #2d3748; /* gray-800 */
+            --pre-text: #f7fafc; /* gray-50 */
+        }
+
+        .theme-dark {
+            --bg-base: #1a202c; /* gray-900 */
+            --text-base: #f7fafc; /* gray-50 */
+            --primary-color: #2dd4bf; /* teal-400 */
+            --input-bg: #2d3748; /* gray-800 */
+            --input-border: #4a5568; /* gray-600 */
+            --card-bg: #2d3748; /* gray-800 */
+            --card-shadow: rgba(0, 0, 0, 0.5);
+            --code-bg: #4a5568; /* gray-600 */
+            --pre-bg: #1a202c; /* gray-900 */
+            --pre-text: #f7fafc; /* gray-50 */
+        }
+        /* Apply variables */
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-base);
+        }
+        .card {
+            background-color: var(--card-bg);
+            box-shadow: 0 4px 6px -1px var(--card-shadow), 0 2px 4px -1px var(--card-shadow);
+        }
+        textarea, input[type="file"] {
+            background-color: var(--input-bg);
+            border-color: var(--input-border);
+            color: var(--text-base);
+        }
+        .theme-button.active {
+            background-color: var(--primary-color);
+            color: #ffffff;
+        }
+        .theme-button {
+            background-color: var(--input-bg);
+            color: var(--text-base);
+        }
+        .theme-button:hover {
+            background-color: var(--input-border);
+        }
+        .deploy-button {
+             background-color: #10B981; /* emerald-500 */
+        }
+        .deploy-button:hover {
+            background-color: #059669; /* emerald-600 */
+        }
+
+    </style>
+</head>
+<body class="p-8">
+    <h1 class="text-4xl font-bold mb-8 text-center" style="color: var(--text-base);">Portfolio Generator</h1>
+
+    <div class="flex flex-col md:flex-row gap-8 max-w-7xl mx-auto">
+        <div class="w-full md:w-1/2 p-6 rounded-lg card">
+            <h2 class="text-2xl font-semibold mb-4" style="color: var(--text-base);">Input Markdown</h2>
+            <input type="file" id="markdownFile" accept=".md" class="mb-4 text-sm px-2 py-1 rounded border">
+            <textarea
+                id="markdownInput"
+                class="w-full h-80 p-4 border rounded-md resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Paste your Markdown content here..."
+            ># My Awesome Portfolio
+
+Hello! I'm a developer.
+
+## About Me
+I specialize in web development with JavaScript, React, and Node.js.
+
+## Experience
+
+### Senior Software Engineer - Tech Solutions Inc. (2022-Present)
+* Led development of a new microservices architecture.
+* Mentored junior developers.
+
+### Software Developer - Innovate Corp. (2019-2022)
+* Developed front-end features for e-commerce platform.
+
+## Projects
+
+### Project X
+A web application for task management. Built with React and Express.
+[View Project](https://example.com/project-x)
+
+\`\`\`javascript
+// Example JavaScript code
+function greet(name) {
+  console.log('Hello, ' + name + '!');
+}
+greet('World');
+\`\`\`
+
+## Skills
+- **Languages:** JavaScript, Python, TypeScript
+- **Frameworks:** React, Node.js, Next.js, Express, Django
+- **Databases:** PostgreSQL, MongoDB
+- **Tools:** Git, Docker, AWS
+
+## Contact
+Email: my.email@example.com
+LinkedIn: [My LinkedIn](https://linkedin.com/in/myprofile)
+GitHub: [My GitHub](https://github.com/myusername)
+</textarea>
+
+            <div class="mt-4">
+                <h3 class="text-xl font-semibold mb-2" style="color: var(--text-base);">Themes</h3>
+                <div class="flex gap-4">
+                    <button id="lightThemeBtn" class="theme-button px-4 py-2 rounded-md active">
+                        Light
+                    </button>
+                    <button id="darkThemeBtn" class="theme-button px-4 py-2 rounded-md">
+                        Dark
+                    </button>
+                    <button id="modernThemeBtn" class="theme-button px-4 py-2 rounded-md">
+                        Modern
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <button id="downloadHtmlBtn" class="w-full deploy-button hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg text-lg">
+                    Download Portfolio HTML
+                </button>
+            </div>
+        </div>
+
+        <div class="w-full md:w-1/2 p-6 rounded-lg card overflow-auto">
+            <h2 class="text-2xl font-semibold mb-4" style="color: var(--text-base);">Live Preview</h2>
+            <div id="previewOutput" class="markdown-output"></div>
+        </div>
+    </div>
+
+    <script>
+        const markdownInput = document.getElementById('markdownInput');
+        const markdownFile = document.getElementById('markdownFile');
+        const previewOutput = document.getElementById('previewOutput');
+        const lightThemeBtn = document.getElementById('lightThemeBtn');
+        const darkThemeBtn = document.getElementById('darkThemeBtn');
+        const modernThemeBtn = document.getElementById('modernThemeBtn');
+        const downloadHtmlBtn = document.getElementById('downloadHtmlBtn');
+        const body = document.body;
+
+        // Custom renderer for marked.js to apply Highlight.js
+        const renderer = new marked.Renderer();
+        renderer.code = function(code, lang) {
+            const highlighted = lang && hljs.getLanguage(lang)
+                ? hljs.highlight(code, { language: lang }).value
+                : hljs.highlightAuto(code).value;
+            return `<pre><code class="hljs ${lang}">${highlighted}</code></pre>`;
+        };
+
+        // Initialize marked with custom renderer
+        marked.setOptions({
+            renderer: renderer,
+            gfm: true, // GitHub flavored markdown
+            breaks: true, // Enable GFM line breaks
+            sanitize: true // Sanitize the HTML output
+        });
+
+        // Function to update preview
+        function updatePreview() {
+            const markdownText = markdownInput.value;
+            previewOutput.innerHTML = marked.parse(markdownText);
+        }
+
+        // Function to apply theme
+        function applyTheme(themeName) {
+            body.classList.remove('theme-dark', 'theme-modern'); // Remove existing themes
+            let primaryColor = '#3b82f6'; // Default for light
+            let codeBg = '#e2e8f0';
+            let preBg = '#2d3748';
+            let preText = '#f7fafc';
+            let preHighlightStyle = 'github-dark'; // Default highlight.js style
+
+            if (themeName === 'dark') {
+                body.classList.add('theme-dark');
+                primaryColor = '#2dd4bf'; // teal-400
+                codeBg = '#4a5568';
+                preBg = '#1a202c';
+                preText = '#f7fafc';
+                preHighlightStyle = 'github-dark'; // Or a lighter one like 'atom-one-dark'
+            } else if (themeName === 'modern') {
+                body.classList.add('theme-modern');
+                primaryColor = '#7e30e1'; // A custom modern purple
+                codeBg = '#f3f4f6'; // gray-100
+                preBg = '#1f2937'; // gray-900
+                preText = '#e5e7eb'; // gray-200
+                preHighlightStyle = 'atom-one-dark'; // A different modern style
+            }
+            
+            // Update CSS variables
+            document.documentElement.style.setProperty('--primary-color', primaryColor);
+            document.documentElement.style.setProperty('--code-bg', codeBg);
+            document.documentElement.style.setProperty('--pre-bg', preBg);
+            document.documentElement.style.setProperty('--pre-text', preText);
+
+            // Update Highlight.js stylesheet
+            document.querySelector('link[href*="highlight.js"]').href = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/${preHighlightStyle}.min.css`;
+
+
+            // Update active state of theme buttons
+            document.querySelectorAll('.theme-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`${themeName}ThemeBtn`).classList.add('active');
+        }
+
+        // Event Listeners
+        markdownInput.addEventListener('input', updatePreview);
+
+        markdownFile.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    markdownInput.value = e.target.result;
+                    updatePreview();
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        lightThemeBtn.addEventListener('click', () => applyTheme('light'));
+        darkThemeBtn.addEventListener('click', () => applyTheme('dark'));
+        modernThemeBtn.addEventListener('click', () => applyTheme('modern'));
+
+        downloadHtmlBtn.addEventListener('click', () => {
+            const portfolioContent = previewOutput.innerHTML;
+            const currentThemeName = body.classList.contains('theme-dark') ? 'dark' : (body.classList.contains('theme-modern') ? 'modern' : 'light');
+            const themeStyles = `
+                <style>
+                    /* Basic Tailwind Typography-like styles for markdown output */
+                    .markdown-output h1 { font-size: 2.25rem; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.75em; }
+                    .markdown-output h2 { font-size: 1.875rem; font-weight: 600; margin-top: 1.25em; margin-bottom: 0.75em; }
+                    .markdown-output h3 { font-size: 1.5rem; font-weight: 600; margin-top: 1em; margin-bottom: 0.5em; }
+                    .markdown-output p { margin-bottom: 1em; line-height: 1.6; }
+                    .markdown-output ul { list-style-type: disc; margin-left: 1.5em; margin-bottom: 1em; }
+                    .markdown-output ol { list-style-type: decimal; margin-left: 1.5em; margin-bottom: 1em; }
+                    .markdown-output li { margin-bottom: 0.5em; }
+                    .markdown-output a { color: var(--primary-color); text-decoration: underline; }
+                    .markdown-output code {
+                        background-color: var(--code-bg);
+                        padding: 0.2em 0.4em;
+                        border-radius: 0.25rem;
+                        font-family: monospace;
+                    }
+                    .markdown-output pre {
+                        background-color: var(--pre-bg);
+                        color: var(--pre-text);
+                        padding: 1em;
+                        border-radius: 0.5rem;
+                        overflow-x: auto;
+                        margin-bottom: 1em;
+                    }
+                    .markdown-output pre code {
+                        background-color: transparent;
+                        padding: 0;
+                        border-radius: 0;
+                        font-size: 0.9em;
+                    }
+                    .markdown-output blockquote {
+                        border-left: 4px solid var(--primary-color);
+                        padding-left: 1em;
+                        margin-left: 0;
+                        color: #4a5568; /* gray-600 */
+                    }
+                    .markdown-output table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 1em;
+                    }
+                    .markdown-output th, .markdown-output td {
+                        border: 1px solid #e2e8f0; /* gray-200 */
+                        padding: 0.75em;
+                        text-align: left;
+                    }
+                    .markdown-output th {
+                        background-color: #f7fafc; /* gray-50 */
+                    }
+                    .markdown-output th, .markdown-output td {
+                        border-color: var(--input-border); /* Use input border for table borders */
+                    }
+
+
+                    /* Theme specific variables */
+                    :root {
+                        --bg-base: #f7fafc;
+                        --text-base: #2d3748;
+                        --primary-color: #3b82f6;
+                        --code-bg: #e2e8f0;
+                        --pre-bg: #2d3748;
+                        --pre-text: #f7fafc;
+                    }
+
+                    .theme-dark {
+                        --bg-base: #1a202c;
+                        --text-base: #f7fafc;
+                        --primary-color: #2dd4bf;
+                        --code-bg: #4a5568;
+                        --pre-bg: #1a202c;
+                        --pre-text: #f7fafc;
+                    }
+
+                    .theme-modern {
+                        --bg-base: #fefce8; /* light yellow */
+                        --text-base: #1f2937; /* gray-900 */
+                        --primary-color: #7e30e1; /* custom purple */
+                        --code-bg: #f3f4f6;
+                        --pre-bg: #1f2937;
+                        --pre-text: #e5e7eb;
+                    }
+
+                    body {
+                        background-color: var(--bg-base);
+                        color: var(--text-base);
+                        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+                        line-height: 1.5;
+                        padding: 2rem;
+                    }
+                    /* Specific overrides for markdown output in dark/modern themes */
+                    .theme-dark .markdown-output code {
+                        background-color: var(--code-bg);
+                        color: var(--code-text-dark, #edf2f7);
+                    }
+                    .theme-dark .markdown-output pre {
+                        background-color: var(--pre-bg);
+                        color: var(--pre-text);
+                    }
+                    .theme-dark .markdown-output th {
+                        background-color: #2d3748; /* gray-800 */
+                        color: #f7fafc;
+                    }
+                    .theme-dark .markdown-output blockquote {
+                        border-color: var(--primary-color);
+                        color: #cbd5e0;
+                    }
+                    .theme-modern .markdown-output code {
+                        background-color: var(--code-bg);
+                        color: var(--text-base);
+                    }
+                    .theme-modern .markdown-output pre {
+                        background-color: var(--pre-bg);
+                        color: var(--pre-text);
+                    }
+                    .theme-modern .markdown-output th {
+                        background-color: #e5e7eb; /* gray-200 */
+                        color: #1f2937;
+                    }
+                    .theme-modern .markdown-output blockquote {
+                        border-color: 
