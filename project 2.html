@@ -1,0 +1,80 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Resume Builder with AI Suggestions</title>
+  <script defer src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script defer src="https://unpkg.com/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+  <script defer src="script.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-6">
+  <div class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
+    <h1 class="text-2xl font-bold mb-4">Smart Resume Builder with AI Suggestions</h1><form id="resumeForm" class="space-y-4">
+  <input class="w-full border p-2" type="text" id="name" placeholder="Full Name" required />
+  <input class="w-full border p-2" type="email" id="email" placeholder="Email" required />
+  <textarea class="w-full border p-2" id="education" placeholder="Education"></textarea>
+  <textarea class="w-full border p-2" id="experience" placeholder="Experience"></textarea>
+  <textarea class="w-full border p-2" id="skills" placeholder="Skills"></textarea>
+
+  <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Save Resume</button>
+  <button type="button" id="suggestBtn" class="bg-green-600 text-white px-4 py-2 rounded ml-2">Get AI Suggestions</button>
+  <button type="button" id="downloadBtn" class="bg-gray-800 text-white px-4 py-2 rounded ml-2">Download PDF</button>
+</form>
+
+<div id="suggestions" class="mt-6 text-sm text-gray-700 whitespace-pre-wrap"></div>
+
+<div id="preview" class="mt-6 bg-gray-50 p-4 border rounded">
+  <h2 class="font-bold text-lg">Live Preview</h2>
+  <div id="resumePreview"></div>
+</div>
+
+  </div>  <script>
+    const form = document.getElementById('resumeForm');
+    const suggestionsDiv = document.getElementById('suggestions');
+    const previewDiv = document.getElementById('resumePreview');
+
+    form.addEventListener('input', () => {
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const education = document.getElementById('education').value;
+      const experience = document.getElementById('experience').value;
+      const skills = document.getElementById('skills').value;
+
+      previewDiv.innerHTML = `
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Education:</strong> ${education}</p>
+        <p><strong>Experience:</strong> ${experience}</p>
+        <p><strong>Skills:</strong> ${skills}</p>
+      `;
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const resumeData = getFormData();
+      await axios.post('http://localhost:5000/save', resumeData);
+      alert('Resume saved successfully!');
+    });
+
+    document.getElementById('suggestBtn').addEventListener('click', async () => {
+      const resumeData = getFormData();
+      const res = await axios.post('http://localhost:5000/suggest', { resumeData });
+      suggestionsDiv.textContent = res.data.suggestions;
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      html2pdf().from(previewDiv).save('resume.pdf');
+    });
+
+    function getFormData() {
+      return {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        education: document.getElementById('education').value,
+        experience: document.getElementById('experience').value,
+        skills: document.getElementById('skills').value,
+      };
+    }
+  </script></body>
+</html>
